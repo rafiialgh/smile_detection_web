@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tooth Cleaning Game</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bungee&family=Cabin&family=Permanent+Marker&display=swap"
+    rel="stylesheet">
+  <style>
+    .font-blackhan { font-family: 'Black Han Sans', sans-serif; }
+    .font-bungee { font-family: 'Bungee', monospace; }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #1E1E1E;
+      background-image: radial-gradient(white 2px, transparent 0);
+      background-size: 40px 40px;
+      background-position: -19px -19px;
+      min-height: 100vh;
+    }
+
+    .header {
+      width: 100%;
+      height: 8rem;
+      border: 1px solid #6b7280;
+      display: flex;
+      align-items: center;
+      background-color: white;
+    }
+
+    @media (min-width: 640px) {
+      .header { height: 10rem; }
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin: 0 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .header-content { margin: 0 2rem; }
+    }
+
+    @media (min-width: 768px) {
+      .header-content { margin: 0 3rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .header-content { margin: 0 5rem; }
+    }
+
+    .header-title {
+      font-size: 2.25rem;
+      color: #252B75;
+    }
+
+    @media (min-width: 640px) {
+      .header-title { font-size: 3rem; }
+    }
+
+    @media (min-width: 768px) {
+      .header-title { font-size: 3.75rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .header-title { font-size: 4.5rem; }
+    }
+
+    .main-content {
+      margin-top: 1rem;
+      position: relative;
+      padding: 0 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .main-content { 
+        margin-top: 1.5rem; 
+        padding: 0 1.5rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .main-content { 
+        margin-top: 25px; 
+        padding: 0;
+      }
+    }
+
+    .loading {
+      position: absolute;
+      background-color: white;
+      overflow: hidden;
+      padding: 2.5rem 5rem;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 50;
+      border-radius: 0.375rem;
+      display: none;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 8px solid transparent;
+      border-radius: 50%;
+      width: 3.5rem;
+      height: 3.5rem;
+      margin: 0 2.5rem;
+      border-top: 8px solid #252B75;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    .smile-image {
+      position: absolute;
+      left: 1rem;
+      top: 2.5rem;
+      display: none;
+    }
+
+    @media (min-width: 640px) {
+      .smile-image { left: 2rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .smile-image { 
+        left: 6rem; 
+        display: block;
+      }
+    }
+
+    .smile-img {
+      width: 15rem;
+      animation: bounce 1s infinite;
+    }
+
+    @media (min-width: 1024px) {
+      .smile-img { width: 20rem; }
+    }
+
+    @keyframes bounce {
+      0%, 20%, 53%, 80%, 100% {
+        transform: translate3d(0,0,0);
+      }
+      40%, 43% {
+        transform: translate3d(0, -30px, 0);
+      }
+      70% {
+        transform: translate3d(0, -15px, 0);
+      }
+      90% {
+        transform: translate3d(0, -4px, 0);
+      }
+    }
+
+    .title-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .title-container { margin-bottom: 1.5rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .title-container { margin-bottom: 0; }
+    }
+
+    .main-title {
+      background-color: #FFE500;
+      padding: 0.25rem 0.5rem;
+      font-size: 1.125rem;
+      text-align: center;
+      line-height: 1.25;
+    }
+
+    @media (min-width: 640px) {
+      .main-title { font-size: 1.5rem; }
+    }
+
+    @media (min-width: 768px) {
+      .main-title { font-size: 1.875rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .main-title { font-size: 2.5rem; }
+    }
+
+    .game-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .game-container { margin-top: 1.5rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .game-container { margin-top: 25px; }
+    }
+
+    .game-area-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 602px;
+      aspect-ratio: 4/3;
+      background-color: #9ca3af;
+      margin: 0 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .game-area-wrapper { margin: 0; }
+    }
+
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      border: 3px solid #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #teeth {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .kuman {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .kuman:hover {
+      transform: scale(1.1);
+    }
+
+    .control-button {
+      position: absolute;
+      background-color: white;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 2px solid black;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    @media (min-width: 640px) {
+      .control-button { 
+        width: 4rem; 
+        height: 4rem; 
+        right: 1rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .control-button { 
+        width: 5rem; 
+        height: 5rem; 
+        right: 2.5rem;
+      }
+    }
+
+    .control-button:hover {
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    .inner-button {
+      background-color: white;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      border: 2px solid black;
+      margin: auto;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    @media (min-width: 640px) {
+      .inner-button { 
+        width: 2.5rem; 
+        height: 2.5rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .inner-button { 
+        width: 3.5rem; 
+        height: 3.5rem; 
+        border-width: 4px;
+      }
+    }
+
+    .inner-button:hover {
+      background-color: #ef4444;
+    }
+
+    .inner-button:active {
+      background-color: #7f1d1d;
+    }
+
+    .instruction-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+      padding: 0 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .instruction-container { margin-top: 1.5rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .instruction-container { margin-top: 25px; }
+    }
+
+    .scoreboard {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .scoreboard-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .scoreboard-title {
+      color: #252B75;
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .scoreboard-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+    }
+
+    .scoreboard-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      margin: 0.5rem 0;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #252B75;
+    }
+
+    .scoreboard-item:nth-child(1) {
+      background-color: #ffd700;
+      border-left-color: #ffb300;
+    }
+
+    .scoreboard-item:nth-child(2) {
+      background-color: #e8e8e8;
+      border-left-color: #c0c0c0;
+    }
+
+    .scoreboard-item:nth-child(3) {
+      background-color: #cd7f32;
+      border-left-color: #a0522d;
+      color: white;
+    }
+
+    .scoreboard-rank {
+      font-weight: bold;
+      font-size: 1.2rem;
+      min-width: 2rem;
+    }
+
+    .scoreboard-name {
+      flex-grow: 1;
+      text-align: left;
+      margin-left: 1rem;
+      font-weight: 600;
+    }
+
+    .scoreboard-score {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #252B75;
+    }
+
+    .scoreboard-item:nth-child(3) .scoreboard-score {
+      color: white;
+    }
+
+    .scoreboard-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    .scoreboard-button {
+      background-color: #252B75;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+
+    .scoreboard-button:hover {
+      background-color: #1a1f5a;
+    }
+
+    .scoreboard-button.secondary {
+      background-color: #6c757d;
+    }
+
+    .scoreboard-button.secondary:hover {
+      background-color: #545b62;
+    }
+
+    .instruction-title {
+      background-color: #FFE500;
+      padding: 0.25rem 0.5rem;
+      font-size: 1rem;
+      text-align: center;
+      line-height: 1.25;
+    }
+
+    @media (min-width: 640px) {
+      .instruction-title { font-size: 1.25rem; }
+    }
+
+    @media (min-width: 768px) {
+      .instruction-title { font-size: 1.5rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .instruction-title { font-size: 2.5rem; }
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1rem 0;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      border: 3px solid #252B75;
+      text-align: center;
+      z-index: 100;
+    }
+
+    #name-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    #name-modal.hidden {
+      display: none !important;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 1rem 0;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .modal-button {
+      background-color: #252B75;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .modal-button:hover {
+      background-color: #1a1f5a;
+    }
+    a {
+        text-decoration: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="header-content">
+      <div>
+        <a href="/" class="block">
+            <h1 class="font-blackhan header-title">WHO'S</h1>
+        </a>
+      </div>
+      <div>
+        <h1 class="font-blackhan header-title">HERE?</h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    
+    <!-- Loading -->
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Starting game...</div>
+    </div>
+
+    <!-- Name Modal -->
+    <div id="name-modal" class="hidden">
+      <div class="modal-content">
+        <h2 class="font-bungee">Enter Your Name</h2>
+        <input type="text" id="player-name" class="modal-input" placeholder="Your name here...">
+        <button id="submit-name" class="modal-button">Start Game</button>
+      </div>
+    </div>
+
+    <!-- Scoreboard Modal -->
+    <div id="scoreboard-modal" class="scoreboard hidden">
+      <div class="scoreboard-content">
+        <h2 class="font-bungee scoreboard-title">🏆 SCOREBOARD 🏆</h2>
+        <ul id="scoreboard-list" class="scoreboard-list">
+          <!-- Scores will be populated here -->
+        </ul>
+        <div class="scoreboard-buttons">
+          <button id="new-game-btn" class="scoreboard-button">New Game</button>
+          <button id="close-scoreboard-btn" class="scoreboard-button secondary">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="smile-image">
+      <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iODAiIGZpbGw9IiNGRkU1MDAiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iNCIvPgo8Y2lyY2xlIGN4PSI3NSIgY3k9IjgwIiByPSI4IiBmaWxsPSJibGFjayIvPgo8Y2lyY2xlIGN4PSIxMjUiIGN5PSI4MCIgcj0iOCIgZmlsbD0iYmxhY2siLz4KPHBhdGggZD0iTTY1IDEyMCBRMTAwIDE1MCAxMzUgMTIwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjQiIGZpbGw9Im5vbmUiLz4KPC9zdmc+" alt="smile" class="smile-img">
+    </div>
+
+    <div class="btn-score">
+        <button class="control-button" id="scoreboard-button" style="right: 6rem;">
+          <div class="inner-button">🏆</div>
+        </button>
+    </div>
+    
+    <div class="title-container">
+      <h1 class="font-bungee main-title">
+        TOOTH CLEANING GAME 🦷
+      </h1>
+    </div>
+
+    <div class="stats">
+      <div>Time: <span id="timer">60</span>s</div>
+      <div>Score: <span id="score">0</span></div>
+    </div>
+
+    <div class="game-container">
+      <div class="game-area-wrapper">
+        <div id="game-area">
+          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQ1MCIgdmlld0JveD0iMCAwIDYwMCA0NTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwhLS0gVGVldGggLS0+CjxnIGZpbGw9IndoaXRlIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMiI+CjwhLS0gVG9wIHJvdyAtLT4KPHN2ZyB4PSI1MCIgeT0iNTAiPgo8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNjAiIHJ4PSI4IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN2ZyB4PSIxMDAiIHk9IjQwIj4KPHJlY3Qgd2lkdGg9IjQ1IiBoZWlnaHQ9IjcwIiByeD0iMTAiIGZpbGw9IndoaXRlIi8+CjwvbWc+CjxzdmcgeD0iMTU1IiB5PSIzNSI+CjxyZWN0IHdpZHRoPSI1MCIgaGVpZ2h0PSI4MCIgcng9IjEyIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN2ZyB4PSIyMTUiIHk9IjMwIj4KPHJlY3Qgd2lkdGg9IjU1IiBoZWlnaHQ9IjkwIiByeD0iMTUiIGZpbGw9IndoaXRlIi8+CjwvZ3V2Zz4KPHN2ZyB4PSIyODAiIHk9IjMwIj4KPHJlY3Qgd2lkdGg9IjU1IiBoZWlnaHQ9IjkwIiByeD0iMTUiIGZpbGw9IndoaXRlIi8+CjwvZ3V2Zz4KPHN2ZyB4PSIzNDUiIHk9IjM1Ij4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjgwIiByeD0iMTIiIGZpbGw9IndoaXRlIi8+CjwvZ3V2Zz4KPHN2ZyB4PSI0MDUiIHk9IjQwIj4KPHJlY3Qgd2lkdGg9IjQ1IiBoZWlnaHQ9IjcwIiByeD0iMTAiIGZpbGw9IndoaXRlIi8+CjwvZ3V2Zz4KPHN2ZyB4PSI0NjAiIHk9IjUwIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjYwIiByeD0iOCIgZmlsbD0id2hpdGUiLz4KPC9zdmVnPgoKPCEtLSBCb3R0b20gcm93IC0tPgo8c3ZnIHg9IjcwIiB5PSIzMDAiPgo8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNjAiIHJ4PSI4IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN2ZyB4PSIxMjAiIHk9IjI5MCI+CjxyZWN0IHdpZHRoPSI0NSIgaGVpZ2h0PSI3MCIgcng9IjEwIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN2ZyB4PSIxNzUiIHk9IjI4NSI+CjxyZWN0IHdpZHRoPSI1MCIgaGVpZ2h0PSI4MCIgcng9IjEyIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN2ZyB4PSIyMzUiIHk9IjI4MCI+CjxyZWN0IHdpZHRoPSI1NSIgaGVpZ2h0PSI5MCIgcng9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN2ZyB4PSIzMDAiIHk9IjI4MCI+CjxyZWN0IHdpZHRoPSI1NSIgaGVpZ2h0PSI5MCIgcng9IjE1IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN2ZyB4PSIzNjUiIHk9IjI4NSI+CjxyZWN0IHdpZHRoPSI1MCIgaGVpZ2h0PSI4MCIgcng9IjEyIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN2ZyB4PSI0MjAiIHk9IjI5MCI+CjxyZWN0IHdpZHRoPSI0NSIgaGVpZ2h0PSI3MCIgcng9IjEwIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPHN2ZyB4PSI0NzAiIHk9IjMwMCI+CjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9IndoaXRlIi8+CjwvZ3V2Zz4KCjwhLS0gR3VtcyAtLT4KPGVsbGlwc2UgY3g9IjMwMCIgY3k9IjE1MCIgcng9IjI4MCIgcnk9IjQwIiBmaWxsPSIjRkZCNkM4Ii8+CjxlbGxpcHNlIGN4PSIzMDAiIGN5PSIzMDAiIHJ4PSIyODAiIHJ5PSI0MCIgZmlsbD0iI0ZGQjZDOCIvPgo8L2c+Cjwvc3ZnPg==" alt="teeth" id="teeth">
+        </div>
+        
+        <button class="control-button" id="start-button">
+          <div class="inner-button">▶</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="instruction-container">
+      <h1 class="font-bungee instruction-title">
+        CLICK THE GERMS TO CLEAN THE TEETH!
+      </h1>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over" class="hidden">
+      <h2 class="font-bungee">Game Over!</h2>
+      <p><strong>Player:</strong> <span id="final-player-name"></span></p>
+      <p><strong>Final Score:</strong> <span id="final-score">0</span></p>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+        <button id="view-scoreboard-btn" class="modal-button">View Scoreboard</button>
+        <button id="reset-button" class="modal-button">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+let score = 0;
+let timeLeft = 60;
+let gameInterval;
+let spawnInterval;
+let gameRunning = false;
+let playerName = "";
+let scores = JSON.parse(localStorage.getItem('toothGameScores')) || [];
+
+const timerEl = document.getElementById("timer");
+const scoreEl = document.getElementById("score");
+const finalScoreEl = document.getElementById("final-score");
+const finalPlayerNameEl = document.getElementById("final-player-name");
+const gameArea = document.getElementById("game-area");
+const gameOverEl = document.getElementById("game-over");
+const startButton = document.getElementById("start-button");
+const scoreboardButton = document.getElementById("scoreboard-button");
+const resetButton = document.getElementById("reset-button");
+const loadingEl = document.getElementById("loading");
+
+// Modal elements
+const nameModal = document.getElementById("name-modal");
+const nameInput = document.getElementById("player-name");
+const nameSubmit = document.getElementById("submit-name");
+
+// Scoreboard elements
+const scoreboardModal = document.getElementById("scoreboard-modal");
+const scoreboardList = document.getElementById("scoreboard-list");
+const newGameBtn = document.getElementById("new-game-btn");
+const closeScoreboardBtn = document.getElementById("close-scoreboard-btn");
+const viewScoreboardBtn = document.getElementById("view-scoreboard-btn");
+
+// Event listeners
+startButton.onclick = () => {
+  // Always ask for name when starting a new game
+  playerName = ""; // Reset player name
+  nameInput.value = ""; // Clear input field
+  nameModal.classList.remove("hidden");
+  nameModal.style.display = "flex";
+  nameInput.focus();
+};
+
+scoreboardButton.onclick = showScoreboard;
+
+nameSubmit.onclick = () => {
+  const nameValue = nameInput.value.trim();
+  if (nameValue !== "") {
+    playerName = nameValue;
+    nameModal.classList.add("hidden");
+    nameModal.style.display = "none";
+    startGame();
+  } else {
+    alert("Please enter your name.");
+  }
+};
+
+// Allow Enter key to submit name
+nameInput.onkeypress = (e) => {
+  if (e.key === 'Enter') {
+    nameSubmit.click();
+  }
+};
+
+resetButton.onclick = () => {
+  gameOverEl.classList.add("hidden");
+  // Reset and ask for new name
+  playerName = "";
+  nameInput.value = "";
+  nameModal.classList.remove("hidden");
+  nameModal.style.display = "flex";
+  nameInput.focus();
+};
+
+viewScoreboardBtn.onclick = () => {
+  gameOverEl.classList.add("hidden");
+  showScoreboard();
+};
+
+newGameBtn.onclick = () => {
+  scoreboardModal.classList.add("hidden");
+  scoreboardModal.style.display = "none";
+  // Ask for new name
+  playerName = "";
+  nameInput.value = "";
+  nameModal.classList.remove("hidden");
+  nameModal.style.display = "flex";
+  nameInput.focus();
+};
+
+closeScoreboardBtn.onclick = () => {
+  scoreboardModal.classList.add("hidden");
+  scoreboardModal.style.display = "none";
+};
+
+function startGame() {
+  if (gameRunning) return;
+
+  // Show loading
+  loadingEl.classList.add("show");
+  
+  // Hide start button when game is running
+  startButton.style.display = "none";
+  
+  setTimeout(() => {
+    loadingEl.classList.remove("show");
+    
+    gameRunning = true;
+    score = 0;
+    timeLeft = 60;
+    scoreEl.textContent = score;
+    timerEl.textContent = timeLeft;
+    gameOverEl.classList.add("hidden");
+
+    gameInterval = setInterval(updateTimer, 1000);
+    spawnInterval = setInterval(spawnKuman, 800);
+  }, 1000);
+}
+
+function updateTimer() {
+  if (timeLeft <= 0) {
+    endGame();
+    return;
+  }
+  timerEl.textContent = timeLeft;
+  timeLeft--;
+}
+
+function spawnKuman() {
+  const kuman = document.createElement("div");
+  kuman.classList.add("kuman");
+  kuman.innerHTML = "🦠";
+  kuman.style.fontSize = "30px";
+
+  const maxX = gameArea.clientWidth - 40;
+  const maxY = gameArea.clientHeight - 40;
+  kuman.style.left = Math.random() * maxX + "px";
+  kuman.style.top = Math.random() * maxY + "px";
+
+  kuman.onclick = () => {
+    score++;
+    scoreEl.textContent = score;
+    kuman.remove();
+    
+    const splash = document.createElement("div");
+    splash.innerHTML = "💥";
+    splash.style.position = "absolute";
+    splash.style.left = kuman.style.left;
+    splash.style.top = kuman.style.top;
+    splash.style.fontSize = "20px";
+    splash.style.pointerEvents = "none";
+    splash.style.zIndex = "1000";
+    gameArea.appendChild(splash);
+    
+    setTimeout(() => splash.remove(), 500);
+  };
+
+  gameArea.appendChild(kuman);
+
+  setTimeout(() => {
+    if (kuman.parentElement === gameArea) {
+      kuman.remove();
+    }
+  }, 3000);
+}
+
+function endGame() {
+  clearInterval(gameInterval);
+  clearInterval(spawnInterval);
+  gameRunning = false;
+  
+  // Show start button again
+  startButton.style.display = "block";
+  
+  // Save score
+  saveScore(playerName, score);
+  
+  // Show game over screen
+  finalScoreEl.textContent = score;
+  finalPlayerNameEl.textContent = playerName;
+  gameOverEl.classList.remove("hidden");
+
+  // Clear remaining germs
+  document.querySelectorAll(".kuman").forEach(kuman => kuman.remove());
+}
+
+function saveScore(name, score) {
+  const newScore = {
+    name: name,
+    score: score,
+    date: new Date().toLocaleDateString()
+  };
+  
+  scores.push(newScore);
+  scores.sort((a, b) => b.score - a.score); // Sort by score descending
+  scores = scores.slice(0, 10); // Keep only top 10
+  
+  localStorage.setItem('toothGameScores', JSON.stringify(scores));
+}
+
+function showScoreboard() {
+  scoreboardList.innerHTML = '';
+  
+  if (scores.length === 0) {
+    scoreboardList.innerHTML = '<li style="text-align: center; padding: 2rem; color: #666;">No scores yet!</li>';
+  } else {
+    scores.forEach((score, index) => {
+      const li = document.createElement('li');
+      li.className = 'scoreboard-item';
+      li.innerHTML = `
+        <span class="scoreboard-rank">#${index + 1}</span>
+        <span class="scoreboard-name">${score.name}</span>
+        <span class="scoreboard-score">${score.score}</span>
+      `;
+      scoreboardList.appendChild(li);
+    });
+  }
+  
+  scoreboardModal.classList.remove("hidden");
+  scoreboardModal.style.display = "flex";
+}
+
+function resetGame() {
+  clearInterval(gameInterval);
+  clearInterval(spawnInterval);
+  gameRunning = false;
+
+  score = 0;
+  timeLeft = 60;
+  scoreEl.textContent = score;
+  timerEl.textContent = timeLeft;
+  finalScoreEl.textContent = "";
+  gameOverEl.classList.add("hidden");
+  
+  // Show start button
+  startButton.style.display = "block";
+
+  // Clear all remaining germs
+  document.querySelectorAll(".kuman").forEach(kuman => kuman.remove());
+}
+</script>
+</body>
+
+</html>
