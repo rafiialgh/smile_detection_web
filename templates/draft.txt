@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smile Scale Detection</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bungee&family=Cabin&family=Permanent+Marker&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .font-blackhan { font-family: 'Black Han Sans', sans-serif; }
+    .font-bungee { font-family: 'Bungee', monospace; }
+    
+    /* Custom dot pattern background */
+    body {
+      background-image: radial-gradient(white 2px, transparent 0);
+      background-size: 40px 40px;
+      background-position: -19px -19px;
+    }
+    
+    /* Webcam container styling */
+    .webcam-container {
+      position: relative;
+      width: 100%;
+      max-width: 602px;
+      aspect-ratio: 4/3;
+      background-color: #9ca3af;
+    }
+    
+    #webcam {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    
+    /* Capture button styling */
+    .capture-btn {
+      position: absolute;
+      background: white;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 2px solid black;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .capture-btn:hover {
+      transform: translateY(-50%) scale(1.05);
+    }
+    
+    .capture-btn.active .inner-dot {
+      background-color: #ef4444;
+    }
+    
+    .inner-dot {
+      background: white;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 4px solid black;
+      transition: background-color 0.3s ease;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .capture-btn {
+        width: 64px;
+        height: 64px;
+        right: 16px;
+      }
+      
+      .inner-dot {
+        width: 40px;
+        height: 40px;
+        border-width: 2px;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .capture-btn {
+        width: 48px;
+        height: 48px;
+        right: 8px;
+      }
+      
+      .inner-dot {
+        width: 32px;
+        height: 32px;
+        border-width: 2px;
+      }
+    }
+    
+    /* Smile emoji animation */
+    .smile-emoji {
+      width: 320px;
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 53%, 80%, 100% {
+        transform: translate3d(0,0,0);
+      }
+      40%, 43% {
+        transform: translate3d(0,-30px,0);
+      }
+      70% {
+        transform: translate3d(0,-15px,0);
+      }
+      90% {
+        transform: translate3d(0,-4px,0);
+      }
+    }
+    
+    /* Loading animation */
+    .loading {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 10;
+    }
+    
+    .loading.show {
+      display: block;
+    }
+    
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 2s linear infinite;
+      margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Result display */
+    .result-display {
+      display: none;
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 229, 0, 0.9);
+      padding: 15px 25px;
+      border-radius: 10px;
+      font-family: 'Bungee', monospace;
+      font-size: 18px;
+      font-weight: bold;
+      z-index: 10;
+    }
+    
+    .result-display.show {
+      display: block;
+      animation: fadeInUp 0.5s ease;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-[#1E1E1E] min-h-screen">
+
+  <div class="w-full h-32 sm:h-40 border border-gray-500 flex items-center bg-white">
+    <div class="flex justify-between items-center w-full mx-4 sm:mx-8 md:mx-12 lg:mx-20">
+      <div class="">
+        <h1 class="font-blackhan text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#252B75]">WHO'S</h1>
+      </div>
+      <div>
+        <h1 class="font-blackhan text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#252B75]">HERE?</h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4 sm:mt-6 lg:mt-[25px] relative px-4 sm:px-6 lg:px-0">
+    
+    <!-- Smile emoji decoration -->
+    <div class="absolute left-4 sm:left-8 lg:left-24 top-10 hidden lg:block">
+      <div class="smile-emoji text-9xl">😊</div>
+    </div>
+    
+    <div class="flex justify-center mb-4 sm:mb-6 lg:mb-0">
+      <h1 class="font-bungee bg-[#FFE500] px-2 py-1 text-lg sm:text-2xl md:text-3xl lg:text-[40px] text-center leading-tight">
+        SMILE SCALE DETECTOR :)
+      </h1>
+    </div>
+
+    <div class="flex justify-center mt-4 sm:mt-6 lg:mt-[25px]">
+      <div class="webcam-container mx-4 sm:mx-0">
+        <video id="webcam" autoplay playsinline></video>
+        
+        <!-- Loading indicator -->
+        <div id="loading" class="loading">
+          <div class="spinner"></div>
+          <div class="text-center">Detecting smile...</div>
+        </div>
+        
+        <!-- Result display -->
+        <div id="result" class="result-display">
+          <span id="resultText">Smile detected! 😊</span>
+        </div>
+        
+        <!-- Capture button -->
+        <button onclick="toggleCapture()" class="capture-btn" id="captureBtn">
+          <div id="innerDot" class="inner-dot"></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex justify-center mt-4 sm:mt-6 lg:mt-[25px] px-2">
+      <h1 class="font-bungee bg-[#FFE500] px-2 py-1 text-base sm:text-xl md:text-2xl lg:text-[40px] text-center leading-tight">
+        SHOW YOUR SMILE TO BEGIN
+      </h1>
+    </div>
+  </div>
+
+<script>
+let stream = null;
+let isCapturing = false;
+
+// Initialize webcam
+async function initializeWebcam() {
+  try {
+    const constraints = {
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: 'user'
+      }
+    };
+    
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('webcam');
+    video.srcObject = stream;
+    
+    // Update instruction text when camera is ready
+    video.onloadedmetadata = () => {
+      document.querySelector('.font-bungee:last-child').innerHTML = 'CAMERA READY - CLICK TO DETECT';
+    };
+    
+  } catch (error) {
+    console.error('Error accessing webcam:', error);
+    alert('Unable to access webcam. Please make sure you have granted camera permissions.');
+  }
+}
+
+// Toggle capture state
+function toggleCapture() {
+  const button = document.getElementById('captureBtn');
+  const innerDot = document.getElementById('innerDot');
+  const loading = document.getElementById('loading');
+  const result = document.getElementById('result');
+  
+  if (!isCapturing) {
+    // Start capturing
+    isCapturing = true;
+    button.classList.add('active');
+    loading.classList.add('show');
+    result.classList.remove('show');
+    
+    // Simulate smile detection (replace with actual AI detection)
+    setTimeout(() => {
+      loading.classList.remove('show');
+      
+      // Simulate random smile detection results
+      const smileIntensity = Math.random();
+      let resultText = '';
+      
+      if (smileIntensity > 0.8) {
+        resultText = 'Amazing smile! 😍 (95% confident)';
+      } else if (smileIntensity > 0.6) {
+        resultText = 'Great smile! 😊 (80% confident)';
+      } else if (smileIntensity > 0.4) {
+        resultText = 'Nice smile! 🙂 (65% confident)';
+      } else if (smileIntensity > 0.2) {
+        resultText = 'Small smile detected 😐 (40% confident)';
+      } else {
+        resultText = 'No smile detected 😔 Try smiling!';
+      }
+      
+      document.getElementById('resultText').textContent = resultText;
+      result.classList.add('show');
+      
+      // Auto-reset after 3 seconds
+      setTimeout(() => {
+        resetCapture();
+      }, 3000);
+      
+    }, 2000);
+  } else {
+    resetCapture();
+  }
+}
+
+function resetCapture() {
+  isCapturing = false;
+  const button = document.getElementById('captureBtn');
+  const loading = document.getElementById('loading');
+  const result = document.getElementById('result');
+  
+  button.classList.remove('active');
+  loading.classList.remove('show');
+  result.classList.remove('show');
+}
+
+// Alternative function name for compatibility
+function toggleDot() {
+  toggleCapture();
+}
+
+// Initialize webcam when page loads
+window.addEventListener('load', () => {
+  initializeWebcam();
+});
+
+// Handle page unload
+window.addEventListener('beforeunload', () => {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+  }
+});
+</script>
+</body>
+
+</html>
