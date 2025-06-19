@@ -50,7 +50,7 @@
     </div>
 
     <!-- Modal Score -->
-    <div id="scoreModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div id="scoreModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 block">
       <div
         class="bg-white shimmer overflow-hidden rounded-xl shadow-xl w-[90%] max-w-md px-6 py-8 text-center relative">
 
@@ -84,19 +84,19 @@
 
 
         <div
-          class="w-16 h-16 absolute rounded-tl-lg border-t-[5px] border-l-[5px] border-black z-50 top-10 left-10 animate-pulse">
+          class="w-16 h-16 absolute rounded-tl-lg border-t-[5px] border-l-[5px] border-black z-10 top-10 left-10 animate-pulse">
         </div>
         <div
-          class="w-16 h-16 absolute rounded-tr-lg border-t-[5px] border-r-[5px] border-black z-50 top-10 right-10 animate-pulse">
+          class="w-16 h-16 absolute rounded-tr-lg border-t-[5px] border-r-[5px] border-black z-10 top-10 right-10 animate-pulse">
         </div>
         <div
-          class="w-16 h-16 absolute rounded-br-lg border-b-[5px] border-r-[5px] border-black z-50 bottom-10 right-10 animate-pulse">
+          class="w-16 h-16 absolute rounded-br-lg border-b-[5px] border-r-[5px] border-black z-10 bottom-10 right-10 animate-pulse">
         </div>
         <div
-          class="w-16 h-16 absolute rounded-bl-lg border-b-[5px] border-l-[5px] border-black z-50 bottom-10 left-10 animate-pulse">
+          class="w-16 h-16 absolute rounded-bl-lg border-b-[5px] border-l-[5px] border-black z-10 bottom-10 left-10 animate-pulse">
         </div>
 
-        <div class="absolute inset-0 flex justify-center items-center z-50 animate-pulse"><img class="w-28"
+        <div class="absolute inset-0 flex justify-center items-center z-10 animate-pulse"><img class="w-28"
             src="static/images/smile_scan.png" alt=""></div>
 
         <video id="webcam" autoplay playsinline
@@ -109,7 +109,7 @@
 
         <canvas id="canvas" class="hidden"></canvas>
         <button onclick="captureImage()"
-          class="absolute z-50 bg-white w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full right-2 sm:right-4 lg:right-10 top-1/2 -translate-y-1/2 border-black border-2 hover:scale-105 transition-transform">
+          class="absolute z-30 bg-white w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full right-2 sm:right-4 lg:right-10 top-1/2 -translate-y-1/2 border-black border-2 hover:scale-105 transition-transform">
           <div id="innerDot"
             class="bg-white w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full border-black border-2 lg:border-4 mx-auto hover:bg-red-500 active:bg-red-900 transition-colors">
           </div>
