@@ -18,10 +18,13 @@
 <body
   class="bg-[#1E1E1E] [background-image:radial-gradient(white_2px,transparent_0)] bg-[length:40px_40px] [background-position:-19px_-19px] min-h-screen">
 
-  <div class="w-full h-32 sm:h-40 border border-gray-500 flex items-center bg-white">
+  <div class="w-full h-32 sm:h-36 border border-gray-500 flex items-center bg-white">
     <div class="flex justify-between items-center w-full mx-4 sm:mx-8 md:mx-12 lg:mx-20">
       <div class="">
         <h1 class="font-blackhan text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#252B75]">WHO'S</h1>
+      </div>
+      <div>
+        
       </div>
       <div>
         <h1 class="font-blackhan text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#252B75]">HERE?</h1>
@@ -30,18 +33,34 @@
   </div>
 
   <div class="mt-4 sm:mt-6 lg:mt-[25px] relative px-4 sm:px-6 lg:px-0">
-    
+
     <!-- Loading -->
-    <div class="absolute shimmer bg-white overflow-hidden px-20 py-10 left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 z-50 rounded-md hidden ">
-      <div class="border-8 rounded-full w-14 h-14 mx-10 border-t-8 border-t-[#252B75] animate-spin transition-all ease-in duration-0"></div>
-      <div class="text-center font-sans font-bold mt-2">Detecting smile...</div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+      <div class="relative shimmer overflow-hidden px-20 py-10 bg-white rounded-xl">
+        <div class="border-8 rounded-full w-14 h-14 mx-10 border-t-8 border-t-[#252B75] animate-spin transition-all ease-in duration-0"></div>
+        <div class="text-center font-sans font-bold mt-2">Detecting smile...</div>
+      </div>
     </div>
 
+    <!-- Modal Score -->
+<div id="scoreModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white shimmer overflow-hidden rounded-xl shadow-xl w-[90%] max-w-md px-6 py-8 text-center relative">
+    
+    <h2 class="text-2xl font-bold text-[#252B75] mb-4">Hasil Senyummu 😁</h2>
+    
+    <p class="text-6xl font-black text-green-500 mb-2" id="scoreValue">78%</p>
+
+    <p class="text-lg text-gray-700 mb-6">Senyummu sudah cerah! Terus pertahankan yaa 😄</p>
+
+    <button onclick="closeScoreModal()" class="px-4 py-2 bg-[#252B75] text-white rounded hover:bg-blue-800 transition">
+      Tutup
+    </button>
+  </div>
+</div>
+
     <div class="absolute left-4 sm:left-8 lg:left-24 top-10 hidden lg:block">
-      <a href="/games" class="block">
-        <img src="{{ url_for('static', filename='images/smile.png') }}" alt="smile" class="w-60 lg:w-80 animate-bounce ">
-      </a>
-      </div>
+      <img src="{{ url_for('static', filename='images/smile.png') }}" alt="smile" class="w-60 lg:w-80 animate-bounce ">
+    </div>
     
     <div class="flex justify-center mb-4 sm:mb-6 lg:mb-0">
       <h1 class="font-bungee bg-[#FFE500] px-2 py-1 text-lg sm:text-2xl md:text-3xl lg:text-[40px] text-center leading-tight">
@@ -50,9 +69,10 @@
     </div>
 
     <div class="flex justify-center mt-4 sm:mt-6 lg:mt-[25px]">
-      <div class="relative w-full max-w-[602px] aspect-[4/3] bg-gray-400 mx-4 sm:mx-0">
-        <video id="webcam" autoplay playsinline class="w-full h-full object-cover absolute top-0 left-0 z-0"></video>
-        <button onclick="toggleDot()"
+      <div class="relative w-full max-w-3xl aspect-[4/3] bg-gray-400 mx-4 sm:mx-0">
+        <video id="webcam" autoplay playsinline class="w-full h-full object-cover absolute top-0 left-0 z-0 -scale-x-100"></video>
+        <canvas id="canvas" class="hidden"></canvas>
+        <button onclick="captureImage()"
           class="absolute bg-white w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full right-2 sm:right-4 lg:right-10 top-1/2 -translate-y-1/2 border-black border-2 hover:scale-105 transition-transform">
           <div id="innerDot"
             class="bg-white w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full border-black border-2 lg:border-4 mx-auto hover:bg-red-500 active:bg-red-900 transition-colors">
