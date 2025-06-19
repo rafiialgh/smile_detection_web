@@ -622,6 +622,18 @@ video {
   z-index: 50;
 }
 
+.z-40 {
+  z-index: 40;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.z-20 {
+  z-index: 20;
+}
+
 .mx-10 {
   margin-left: 2.5rem;
   margin-right: 2.5rem;
