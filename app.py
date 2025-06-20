@@ -9,7 +9,7 @@ def index():
 
 @app.route('/analyze', methods=['POST'])
 
-#@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 
 def upload():
     data = request.get_json()
