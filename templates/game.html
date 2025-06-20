@@ -20,6 +20,9 @@
       background-size: 40px 40px;
       background-position: -19px -19px;
       min-height: 100vh;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
     }
 
     .header {
@@ -241,24 +244,65 @@
       border: 3px solid #ccc;
       border-radius: 10px;
       overflow: hidden;
+      touch-action: none;
     }
 
     #teeth {
       width: 100%;
       height: 100%;
       object-fit: contain;
+      pointer-events: none;
     }
 
     .kuman {
       position: absolute;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
+      width: 50px;
+      height: 50px;
       transition: transform 0.1s;
+      user-select: none;
+      pointer-events: none;
+      z-index: 10;
     }
 
-    .kuman:hover {
-      transform: scale(1.1);
+    .kuman.swiped {
+      animation: swipeEffect 0.3s ease-out forwards;
+    }
+
+    @keyframes swipeEffect {
+      0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.3) rotate(180deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(0) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .swipe-trail {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background-color: #FFE500;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 5;
+      animation: trailFade 0.5s ease-out forwards;
+    }
+
+    @keyframes trailFade {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
     }
 
     .control-button {
@@ -628,14 +672,14 @@
     </div>
 
     <div class="stats">
-      <div>Time: <span id="timer">60</span>s</div>
+      <div>Time: <span id="timer">15</span>s</div>
       <div>Score: <span id="score">0</span></div>
     </div>
 
     <div class="game-container">
       <div class="game-area-wrapper">
         <div id="game-area">
-          <img src="static/images/teeth.jpg" alt="teeth" id="teeth">
+          <img src="static/images/gigi.svg" alt="teeth" id="teeth">
         </div>
         
         <button class="control-button" id="start-button">
@@ -646,7 +690,7 @@
 
     <div class="instruction-container">
       <h1 class="font-bungee instruction-title">
-        CLICK THE GERMS TO CLEAN THE TEETH!
+        SWIPE THE GERMS TO CLEAN THE TEETH!
       </h1>
     </div>
 
@@ -664,12 +708,18 @@
 
 <script>
 let score = 0;
-let timeLeft = 60;
+let timeLeft = 15;
 let gameInterval;
 let spawnInterval;
 let gameRunning = false;
 let playerName = "";
-let scores = JSON.parse(localStorage.getItem('toothGameScores')) || [];
+let scores = [];
+
+// Touch/Swipe variables
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+let currentTrail = [];
 
 const timerEl = document.getElementById("timer");
 const scoreEl = document.getElementById("score");
@@ -694,11 +744,156 @@ const newGameBtn = document.getElementById("new-game-btn");
 const closeScoreboardBtn = document.getElementById("close-scoreboard-btn");
 const viewScoreboardBtn = document.getElementById("view-scoreboard-btn");
 
+// Initialize touch events for game area
+function initTouchEvents() {
+  gameArea.addEventListener('touchstart', handleTouchStart, { passive: false });
+  gameArea.addEventListener('touchmove', handleTouchMove, { passive: false });
+  gameArea.addEventListener('touchend', handleTouchEnd, { passive: false });
+  
+  // Also add mouse events for desktop testing
+  gameArea.addEventListener('mousedown', handleMouseDown);
+  gameArea.addEventListener('mousemove', handleMouseMove);
+  gameArea.addEventListener('mouseup', handleMouseEnd);
+  gameArea.addEventListener('mouseleave', handleMouseEnd);
+}
+
+function handleTouchStart(e) {
+  if (!gameRunning) return;
+  e.preventDefault();
+  
+  const touch = e.touches[0];
+  const rect = gameArea.getBoundingClientRect();
+  lastX = touch.clientX - rect.left;
+  lastY = touch.clientY - rect.top;
+  isDrawing = true;
+  currentTrail = [];
+}
+
+function handleTouchMove(e) {
+  if (!gameRunning || !isDrawing) return;
+  e.preventDefault();
+  
+  const touch = e.touches[0];
+  const rect = gameArea.getBoundingClientRect();
+  const currentX = touch.clientX - rect.left;
+  const currentY = touch.clientY - rect.top;
+  
+  // Create trail effect
+  createTrail(currentX, currentY);
+  
+  // Check for collisions with germs
+  checkGermCollision(currentX, currentY);
+  
+  lastX = currentX;
+  lastY = currentY;
+}
+
+function handleTouchEnd(e) {
+  if (!gameRunning) return;
+  e.preventDefault();
+  isDrawing = false;
+  currentTrail = [];
+}
+
+// Mouse events for desktop
+function handleMouseDown(e) {
+  if (!gameRunning) return;
+  e.preventDefault();
+  
+  const rect = gameArea.getBoundingClientRect();
+  lastX = e.clientX - rect.left;
+  lastY = e.clientY - rect.top;
+  isDrawing = true;
+  currentTrail = [];
+}
+
+function handleMouseMove(e) {
+  if (!gameRunning || !isDrawing) return;
+  e.preventDefault();
+  
+  const rect = gameArea.getBoundingClientRect();
+  const currentX = e.clientX - rect.left;
+  const currentY = e.clientY - rect.top;
+  
+  // Create trail effect
+  createTrail(currentX, currentY);
+  
+  // Check for collisions with germs
+  checkGermCollision(currentX, currentY);
+  
+  lastX = currentX;
+  lastY = currentY;
+}
+
+function handleMouseEnd(e) {
+  if (!gameRunning) return;
+  isDrawing = false;
+  currentTrail = [];
+}
+
+function createTrail(x, y) {
+  const trail = document.createElement('div');
+  trail.className = 'swipe-trail';
+  trail.style.left = x + 'px';
+  trail.style.top = y + 'px';
+  gameArea.appendChild(trail);
+  
+  // Remove trail after animation
+  setTimeout(() => {
+    if (trail.parentElement) {
+      trail.remove();
+    }
+  }, 500);
+}
+
+function checkGermCollision(x, y) {
+  const germs = document.querySelectorAll('.kuman:not(.swiped)');
+  
+  germs.forEach(germ => {
+    const germRect = germ.getBoundingClientRect();
+    const gameAreaRect = gameArea.getBoundingClientRect();
+    
+    const germX = germRect.left - gameAreaRect.left + germRect.width / 2;
+    const germY = germRect.top - gameAreaRect.top + germRect.height / 2;
+    
+    const distance = Math.sqrt(Math.pow(x - germX, 2) + Math.pow(y - germY, 2));
+    
+    if (distance < 30) { // Collision threshold
+      destroyGerm(germ);
+    }
+  });
+}
+
+function destroyGerm(germ) {
+  if (germ.classList.contains('swiped')) return;
+  
+  germ.classList.add('swiped');
+  score++;
+  scoreEl.textContent = score;
+  
+  // Create explosion effect
+  const explosion = document.createElement("div");
+  explosion.innerHTML = "💥";
+  explosion.style.position = "absolute";
+  explosion.style.left = germ.style.left;
+  explosion.style.top = germ.style.top;
+  explosion.style.fontSize = "30px";
+  explosion.style.pointerEvents = "none";
+  explosion.style.zIndex = "1000";
+  explosion.style.animation = "swipeEffect 0.5s ease-out forwards";
+  gameArea.appendChild(explosion);
+  
+  // Remove germ and explosion
+  setTimeout(() => {
+    if (germ.parentElement) germ.remove();
+    if (explosion.parentElement) explosion.remove();
+  }, 300);
+}
+
 // Event listeners
 startButton.onclick = () => {
-  // Always ask for name when starting a new game
-  playerName = ""; // Reset player name
-  nameInput.value = ""; // Clear input field
+  playerName = "";
+  nameInput.value = "";
   nameModal.classList.remove("hidden");
   nameModal.style.display = "flex";
   nameInput.focus();
@@ -718,7 +913,6 @@ nameSubmit.onclick = () => {
   }
 };
 
-// Allow Enter key to submit name
 nameInput.onkeypress = (e) => {
   if (e.key === 'Enter') {
     nameSubmit.click();
@@ -727,7 +921,6 @@ nameInput.onkeypress = (e) => {
 
 resetButton.onclick = () => {
   gameOverEl.classList.add("hidden");
-  // Reset and ask for new name
   playerName = "";
   nameInput.value = "";
   nameModal.classList.remove("hidden");
@@ -743,7 +936,6 @@ viewScoreboardBtn.onclick = () => {
 newGameBtn.onclick = () => {
   scoreboardModal.classList.add("hidden");
   scoreboardModal.style.display = "none";
-  // Ask for new name
   playerName = "";
   nameInput.value = "";
   nameModal.classList.remove("hidden");
@@ -759,10 +951,7 @@ closeScoreboardBtn.onclick = () => {
 function startGame() {
   if (gameRunning) return;
 
-  // Show loading
   loadingEl.classList.add("show");
-  
-  // Hide start button when game is running
   startButton.style.display = "none";
   
   setTimeout(() => {
@@ -770,13 +959,13 @@ function startGame() {
     
     gameRunning = true;
     score = 0;
-    timeLeft = 60;
+    timeLeft = 15;
     scoreEl.textContent = score;
     timerEl.textContent = timeLeft;
     gameOverEl.classList.add("hidden");
 
     gameInterval = setInterval(updateTimer, 1000);
-    spawnInterval = setInterval(spawnKuman, 800);
+    spawnInterval = setInterval(spawnKuman, 1000);
   }, 1000);
 }
 
@@ -793,44 +982,28 @@ function spawnKuman() {
   const kuman = document.createElement("div");
   kuman.classList.add("kuman");
   kuman.innerHTML = "🦠";
-  kuman.style.fontSize = "30px";
+  kuman.style.fontSize = "40px";
 
-  const maxX = gameArea.clientWidth - 40;
-  const maxY = gameArea.clientHeight - 40;
+  const maxX = gameArea.clientWidth - 50;
+  const maxY = gameArea.clientHeight - 50;
   kuman.style.left = Math.random() * maxX + "px";
   kuman.style.top = Math.random() * maxY + "px";
 
-  kuman.onclick = () => {
-    score++;
-    scoreEl.textContent = score;
-    kuman.remove();
-    
-    const splash = document.createElement("div");
-    splash.innerHTML = "💥";
-    splash.style.position = "absolute";
-    splash.style.left = kuman.style.left;
-    splash.style.top = kuman.style.top;
-    splash.style.fontSize = "20px";
-    splash.style.pointerEvents = "none";
-    splash.style.zIndex = "1000";
-    gameArea.appendChild(splash);
-    
-    setTimeout(() => splash.remove(), 500);
-  };
-
   gameArea.appendChild(kuman);
 
+  // Auto-remove after 4 seconds if not swiped
   setTimeout(() => {
-    if (kuman.parentElement === gameArea) {
+    if (kuman.parentElement === gameArea && !kuman.classList.contains('swiped')) {
       kuman.remove();
     }
-  }, 3000);
+  }, 4000);
 }
 
 function endGame() {
   clearInterval(gameInterval);
   clearInterval(spawnInterval);
   gameRunning = false;
+  isDrawing = false;
   
   // Show start button again
   startButton.style.display = "block";
@@ -843,8 +1016,9 @@ function endGame() {
   finalPlayerNameEl.textContent = playerName;
   gameOverEl.classList.remove("hidden");
 
-  // Clear remaining germs
+  // Clear remaining germs and trails
   document.querySelectorAll(".kuman").forEach(kuman => kuman.remove());
+  document.querySelectorAll(".swipe-trail").forEach(trail => trail.remove());
 }
 
 function saveScore(name, score) {
@@ -857,8 +1031,6 @@ function saveScore(name, score) {
   scores.push(newScore);
   scores.sort((a, b) => b.score - a.score); // Sort by score descending
   scores = scores.slice(0, 10); // Keep only top 10
-  
-  localStorage.setItem('toothGameScores', JSON.stringify(scores));
 }
 
 function showScoreboard() {
@@ -887,9 +1059,10 @@ function resetGame() {
   clearInterval(gameInterval);
   clearInterval(spawnInterval);
   gameRunning = false;
+  isDrawing = false;
 
   score = 0;
-  timeLeft = 60;
+  timeLeft = 15;
   scoreEl.textContent = score;
   timerEl.textContent = timeLeft;
   finalScoreEl.textContent = "";
@@ -898,10 +1071,16 @@ function resetGame() {
   // Show start button
   startButton.style.display = "block";
 
-  // Clear all remaining germs
+  // Clear all remaining germs and trails
   document.querySelectorAll(".kuman").forEach(kuman => kuman.remove());
+  document.querySelectorAll(".swipe-trail").forEach(trail => trail.remove());
 }
+
+// Initialize touch events when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initTouchEvents();
+});
+
 </script>
 </body>
-
 </html>

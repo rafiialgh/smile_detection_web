@@ -819,6 +819,8 @@ video {
 
 .w-28 {
   width: 7rem;
+.w-28 {
+  width: 7rem;
 }
 
 .w-60 {
@@ -1417,6 +1419,10 @@ video {
 
 .ease-in {
   transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
 @keyframes shimmer {
