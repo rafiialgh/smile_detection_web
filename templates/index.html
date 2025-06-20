@@ -52,13 +52,25 @@
     <!-- Modal Score -->
     <div id="scoreModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 block">
       <div
-        class="bg-white shimmer overflow-hidden rounded-xl shadow-xl w-[90%] max-w-md px-6 py-8 text-center relative">
+        class="bg-white shimmer overflow-hidden rounded-xl shadow-xl w-[90%] max-w-2xl px-6 py-8 text-center relative">
 
-        <h2 class="text-2xl font-bold text-[#252B75] mb-4">Hasil Senyummu 😁</h2>
+        <div class="flex flex-row ">
+          <div class="basis-1/2">
+            <h2 class="text-2xl font-bold text-[#252B75] mb-4">Hasil Senyummu 😁</h2>
 
-        <p class="text-6xl font-black text-green-500 mb-2" id="scoreValue">78%</p>
+            <p class="text-6xl font-black text-green-500 mb-2" id="smileValue">Senyum</p>
 
-        <p class="text-lg text-gray-700 mb-6">Senyummu sudah cerah! Terus pertahankan yaa 😄</p>
+            <p class="text-lg text-gray-700 mb-6" id="smileContext">Senyummu sudah cerah! Terus pertahankan yaa 😄</p>
+          </div>
+
+          <div class="basis-1/2">
+            <h2 class="text-2xl font-bold text-[#252B75] mb-4">Hasil Skor Gigimu 🦷</h2>
+
+            <p class="text-6xl font-black text-green-500 mb-2" id="scoreValue">78%</p>
+
+            <p class="text-lg text-gray-700 mb-6">Gigimu sudah terlihat bersih! Terus pertahankan yaa 😄</p>
+          </div>
+        </div>
 
         <button onclick="closeScoreModal()"
           class="px-4 py-2 bg-[#252B75] text-white rounded hover:bg-blue-800 transition">
@@ -102,10 +114,11 @@
         <video id="webcam" autoplay playsinline
           class="w-full h-full object-cover absolute top-0 left-0 z-0 -scale-x-100"></video>
 
-          <!-- Scan line animation -->
-            <div class="absolute inset-0 z-30 overflow-hidden">
-                <div class="scan-line absolute w-full h-1 bg-gradient-to-r from-transparent via-green-400 to-transparent"></div>
-            </div>
+        <!-- Scan line animation -->
+        <div class="absolute inset-0 z-30 overflow-hidden">
+          <div class="scan-line absolute w-full h-1 bg-gradient-to-r from-transparent via-green-400 to-transparent">
+          </div>
+        </div>
 
         <canvas id="canvas" class="hidden"></canvas>
         <button onclick="captureImage()"
