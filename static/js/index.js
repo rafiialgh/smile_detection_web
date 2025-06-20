@@ -18,21 +18,28 @@ async function setupCamera() {
 }
 
 function captureImage() {
-  const dot = document.getElementById('innerDot');
-  dot.classList.toggle('bg-white');
-  dot.classList.toggle('bg-gray-200');
+  const modalCountdown = document.getElementById('modalCountdown')
+  const dot = document.getElementById('countdown');
+  const buttonCapture = document.getElementById('buttonCapture')
+  // dot.classList.toggle('bg-white');
+  // dot.classList.toggle('bg-gray-200');
 
   // Tampilkan countdown selama 3 detik sebelum mengambil gambar
   let countdown = 3;
-  const originalText = dot.innerHTML;
+  // const originalText = dot.innerHTML;
   dot.innerText = countdown;
+  modalCountdown.classList.remove('hidden');
+  buttonCapture.disabled = true
 
   const countdownInterval = setInterval(() => {
     countdown--;
     if (countdown > 0) {
+      
       dot.innerText = countdown;
     } else {
       clearInterval(countdownInterval);
+      modalCountdown.classList.add('hidden');
+      buttonCapture.disabled = false
       dot.innerText = ''; // Bersihkan tampilan countdown
       dot.classList.toggle('bg-white');
       dot.classList.toggle('bg-gray-200');

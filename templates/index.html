@@ -1,141 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smile Scale Detection</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bungee&family=Cabin&family=Permanent+Marker&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="{{url_for('static', filename='css/output.css')}}">
-  <style>
-    .font-blackhan {
-      font-family: 'Black Han Sans', sans-serif;
-    }
+{% block content %}
+<div class="mt-4 sm:mt-6 lg:mt-[25px] relative px-4 sm:px-6 lg:px-0">
 
-    .font-bungee {
-      font-family: 'Bungee', monospace;
-    }
-  </style>
-</head>
-
-<body
-  class="bg-[#1E1E1E] [background-image:radial-gradient(white_2px,transparent_0)] bg-[length:40px_40px] [background-position:-19px_-19px] min-h-screen">
-
-  <div class="w-full h-32 sm:h-36 border border-gray-500 flex items-center bg-white">
-    <div class="flex justify-between items-center w-full mx-4 sm:mx-8 md:mx-12 lg:mx-20">
-      <div class="">
-        <h1 class="font-blackhan text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#252B75]">WHO'S</h1>
-      </div>
-      <div>
-
-      </div>
-      <div>
-        <h1 class="font-blackhan text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#252B75]">HERE?</h1>
-      </div>
-    </div>
-  </div>
-
-  <div class="mt-4 sm:mt-6 lg:mt-[25px] relative px-4 sm:px-6 lg:px-0">
-
-    <!-- Loading -->
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-      <div class="relative shimmer overflow-hidden px-20 py-10 bg-white rounded-xl">
-        <div
-          class="border-8 rounded-full w-14 h-14 mx-10 border-t-8 border-t-[#252B75] animate-spin transition-all ease-in duration-0">
-        </div>
-        <div class="text-center font-sans font-bold mt-2">Detecting smile...</div>
-      </div>
-    </div>
-
-    <!-- Modal Score -->
-    <div id="scoreModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 block">
+  <!-- Loading -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+    <div class="relative px-20 py-10 overflow-hidden bg-white shimmer rounded-xl">
       <div
-        class="bg-white shimmer overflow-hidden rounded-xl shadow-xl w-[90%] max-w-2xl px-6 py-8 text-center relative">
-
-        <div class="flex flex-row ">
-          <div class="basis-1/2">
-            <h2 class="text-2xl font-bold text-[#252B75] mb-4">Hasil Senyummu 😁</h2>
-            
-          </div>
-
-          <div class="basis-1/2">
-            <h2 class="text-2xl font-bold text-[#252B75] mb-4">Hasil Skor Gigimu 🦷</h2>
-
-            <p class="text-6xl font-black text-green-500 mb-2" id="scoreValue">78%</p>
-
-            <p class="text-lg text-gray-700 mb-6">Gigimu sudah terlihat bersih! Terus pertahankan yaa 😄</p>
-          </div>
-        </div>
-
-        <button onclick="closeScoreModal()"
-          class="px-4 py-2 bg-[#252B75] text-white rounded hover:bg-blue-800 transition">
-          Tutup
-        </button>
+        class="border-8 rounded-full w-14 h-14 mx-10 border-t-8 border-t-[#252B75] animate-spin transition-all ease-in duration-0">
       </div>
-    </div>
-
-    <div class="absolute left-4 sm:left-8 lg:left-24 top-10 hidden lg:block">
-      <img src="{{ url_for('static', filename='images/smile.png') }}" alt="smile" class="w-60 lg:w-80 animate-bounce ">
-    </div>
-
-    <div class="flex justify-center mb-4 sm:mb-6 lg:mb-0">
-      <h1
-        class="font-bungee bg-[#FFE500] px-2 py-1 text-lg sm:text-2xl md:text-3xl lg:text-[40px] text-center leading-tight">
-        SMILE SCALE DETECTOR :)
-      </h1>
-    </div>
-
-    <div class="flex justify-center mt-4 sm:mt-6 lg:mt-[25px]">
-      <div class="relative w-full  h-full max-w-3xl aspect-[4/3] bg-gray-400 mx-4 sm:mx-0">
-
-
-
-        <div
-          class="w-16 h-16 absolute rounded-tl-lg border-t-[5px] border-l-[5px] border-black z-10 top-10 left-10 animate-pulse">
-        </div>
-        <div
-          class="w-16 h-16 absolute rounded-tr-lg border-t-[5px] border-r-[5px] border-black z-10 top-10 right-10 animate-pulse">
-        </div>
-        <div
-          class="w-16 h-16 absolute rounded-br-lg border-b-[5px] border-r-[5px] border-black z-10 bottom-10 right-10 animate-pulse">
-        </div>
-        <div
-          class="w-16 h-16 absolute rounded-bl-lg border-b-[5px] border-l-[5px] border-black z-10 bottom-10 left-10 animate-pulse">
-        </div>
-
-        <div class="absolute inset-0 flex justify-center items-center z-10 animate-pulse"><img class="w-28"
-            src="static/images/smile_scan.png" alt=""></div>
-
-        <video id="webcam" autoplay playsinline
-          class="w-full h-full object-cover absolute top-0 left-0 z-0 -scale-x-100"></video>
-
-        <!-- Scan line animation -->
-        <div class="absolute inset-0 z-30 overflow-hidden">
-          <div class="scan-line absolute w-full h-1 bg-gradient-to-r from-transparent via-green-400 to-transparent">
-          </div>
-        </div>
-
-        <canvas id="canvas" class="hidden"></canvas>
-        <button onclick="captureImage()"
-          class="absolute z-30 bg-white w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full right-2 sm:right-4 lg:right-10 top-1/2 -translate-y-1/2 border-black border-2 hover:scale-105 transition-transform">
-          <div id="innerDot"
-            class="bg-white w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full border-black border-2 lg:border-4 mx-auto hover:bg-red-500 active:bg-red-900 transition-colors">
-          </div>
-        </button>
-      </div>
-    </div>
-
-    <div class="flex justify-center mt-4 sm:mt-6 lg:mt-[25px] px-2">
-      <h1
-        class="font-bungee bg-[#FFE500] px-2 py-1 text-base sm:text-xl md:text-2xl lg:text-[40px] text-center leading-tight">
-        SHOW YOUR SMILE TO BEGIN
-      </h1>
+      <div class="mt-2 font-sans font-bold text-center">Detecting smile...</div>
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-</body>
+  <!-- Modal Score -->
+  <div id="scoreModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+    <div class="bg-white shimmer overflow-hidden rounded-xl shadow-xl w-[90%] max-w-2xl px-6 py-8 text-center relative">
 
-</html>
+      <div class="flex flex-row ">
+        <div class="basis-1/2">
+          <h2 class="text-xl sm:text-2xl font-bold text-[#252B75] mb-4">Hasil Senyummu 😁</h2>
+
+          <p class="mb-2 text-3xl font-black text-green-500 sm:text-4xl" id="smileValue">Tidak Tersenyum</p>
+
+          <p class="mb-6 text-sm text-gray-700 sm:text-lg">Senyummu sudah cerah! Terus pertahankan yaa 😄</p>
+        </div>
+
+        <div class="basis-1/2">
+          <h2 class="text-xl sm:text-2xl font-bold text-[#252B75] mb-4">Hasil Skor Gigimu 🦷</h2>
+
+          <p class="mb-2 text-3xl font-black text-green-500 sm:text-4xl" id="scoreValue">78%</p>
+
+          <p class="mb-6 text-sm text-gray-700 sm:text-lg">Gigimu sudah terlihat bersih! Terus pertahankan yaa 😄</p>
+        </div>
+      </div>
+
+      <button onclick="closeScoreModal()"
+        class="relative px-4 py-2 bg-[#252B75] text-white rounded hover:bg-blue-800 transition z-10">
+        Tutup
+      </button>
+    </div>
+  </div>
+
+  <!-- <div class="absolute hidden left-4 sm:left-8 lg:left-24 top-10 lg:block">
+      <img src="{{ url_for('static', filename='images/smile.png') }}" alt="smile" class="w-60 lg:w-80 animate-bounce ">
+    </div> -->
+
+
+
+  <div class="flex justify-center mt-10 mb-4 sm:mb-6 lg:mb-0">
+    <h1
+      class="font-bungee bg-[#FFE500] px-2 py-1 lg:px-5 lg:py-3 text-lg sm:text-2xl md:text-4xl lg:text-[55px] text-center leading-tight">
+      SMILE SCALE DETECTOR :)
+    </h1>
+  </div>
+
+  <!-- Camera  -->
+  <div class="flex justify-center mt-4 sm:mt-6 lg:mt-10">
+    <div class="relative w-full max-w-4xl aspect-[3/4] bg-gray-400 mx-4 sm:mx-0">
+      
+      <!-- Countdown -->
+      <div id="modalCountdown" class="absolute left-1/2 -translate-x-1/2 top-10 z-40 hidden">
+        <div class="px-16 py-4 bg-white rounded-xl shadow-lg">
+          <p class="text-3xl font-semibold">Smile in...</p>
+          <p id="countdown" class="font-bold text-center text-[#252B75] text-4xl">10</p>
+        </div>
+      </div>
+      
+      <div
+        class="w-16 h-16 absolute rounded-tl-lg border-t-[5px] border-l-[5px] border-black z-10 top-10 left-10 animate-pulse">
+      </div>
+      <div
+        class="w-16 h-16 absolute rounded-tr-lg border-t-[5px] border-r-[5px] border-black z-10 top-10 right-10 animate-pulse">
+      </div>
+      <div
+        class="w-16 h-16 absolute rounded-br-lg border-b-[5px] border-r-[5px] border-black z-10 bottom-10 right-10 animate-pulse">
+      </div>
+      <div
+        class="w-16 h-16 absolute rounded-bl-lg border-b-[5px] border-l-[5px] border-black z-10 bottom-10 left-10 animate-pulse">
+      </div>
+
+      <div class="absolute inset-0 z-10 flex items-center justify-center animate-pulse"><img class="w-28"
+          src="static/images/smile_scan.png" alt=""></div>
+
+      <video id="webcam" autoplay playsinline
+        class="absolute top-0 left-0 z-0 object-cover w-full h-full -scale-x-100"></video>
+
+      <!-- Scan line animation -->
+      <div class="absolute inset-0 z-30 overflow-hidden">
+        <div class="absolute w-full h-1 scan-line bg-gradient-to-r from-transparent via-green-400 to-transparent">
+        </div>
+      </div>
+
+      <canvas id="canvas" class="hidden"></canvas>
+      <button id="buttonCapture" onclick="captureImage()"
+        class="absolute z-30 w-12 h-12 transition-transform -translate-y-1/2 bg-white border-2 border-black rounded-full sm:w-16 sm:h-16 lg:w-20 lg:h-20 right-2 sm:right-4 lg:right-10 top-1/2 hover:scale-105">
+        <div id="innerDot"
+          class="w-8 h-8 mx-auto transition-colors bg-white border-2 border-black rounded-full sm:w-10 sm:h-10 lg:w-14 lg:h-14 lg:border-4 hover:bg-red-500 active:bg-red-900">
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex justify-center px-2 mt-4 sm:mt-6 lg:mt-10">
+    <h1
+      class="font-bungee bg-[#FFE500] px-2 py-1 lg:px-5 lg:py-3 text-lg sm:text-2xl md:text-4xl lg:text-[55px] text-center leading-tight">
+      SHOW YOUR SMILE TO BEGIN
+    </h1>
+  </div>
+</div>
+
+{% endblock %}

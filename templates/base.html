@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smile Scale Detection</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bungee&family=Cabin&family=Permanent+Marker&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/output.css')}}">
+  <style>
+    .font-blackhan {
+      font-family: 'Black Han Sans', sans-serif;
+    }
+
+    .font-bungee {
+      font-family: 'Bungee', monospace;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-[#1E1E1E] [background-image:radial-gradient(white_2px,transparent_0)] bg-[length:40px_40px] [background-position:-19px_-19px] min-h-screen"">
+  <div class=" w-full h-32 sm:h-32 border border-gray-500 flex items-center bg-white">
+  <div class="flex justify-between items-center w-full mx-4 sm:mx-8 md:mx-12 lg:mx-20">
+    <div>
+      <h1 class="font-blackhan text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#252B75]">WHO'S</h1>
+    </div>
+    <div>
+      <h1 class="font-cabin font-bold italic text-3xl text-[#252B75]">
+        <span class="relative">
+          <span class="absolute w-36 -top-8 -left-6 -rotate-6"><img src="static/images/brush.png" alt=""></span>
+          <span class="font-marker z-10 relative text-white -rotate-6">
+            berani
+          </span>
+        </span>
+
+        Senyum
+      </h1>
+      <h1 class="font-cabin font-bold italic text-3xl text-center text-[#252B75]">
+        Tanpa Ragu
+      </h1>
+    </div>
+    <div>
+      <h1 class="font-blackhan text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#252B75]">HERE?</h1>
+    </div>
+  </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="flex justify-center mt-10">
+    <div class="flex gap-6">
+
+      <!-- Detection -->
+      <div
+        class="group flex items-center bg-white rounded-lg w-16 h-16 overflow-hidden transition-all duration-300 hover:w-48 cursor-pointer shadow-inner shadow-[#FFE500]">
+        <div class="text-3xl mx-auto group-hover:mx-4">🧠</div>
+        <span
+          class="whitespace text-2xl text-[#252B75] font-bold hidden group-hover:inline transition-opacity duration-300"><a
+            href="/">Detection</a></span>
+      </div>
+
+      <!-- Games -->
+      <div
+        class="group flex items-center bg-white rounded-lg w-16 h-16 overflow-hidden transition-all duration-300 hover:w-48 cursor-pointer shadow-inner shadow-[#FFE500]  drop-shadow-lg">
+        <div class="text-3xl mx-auto group-hover:mx-4">🎮</div>
+        <span
+          class="whitespace-nowrap text-2xl text-[#252B75] font-bold hidden group-hover:inline transition-opacity duration-300"><a
+            href="/games">Games</a></span>
+      </div>
+
+      <!-- Gallery -->
+      <div
+        class="group flex items-center bg-white rounded-lg w-16 h-16 overflow-hidden transition-all duration-300 hover:w-48 cursor-pointer shadow-inner shadow-[#FFE500]  drop-shadow-lg">
+        <div class="text-3xl mx-auto group-hover:mx-4">🖼️</div>
+        <span
+          class="whitespace-nowrap text-2xl text-[#252B75] font-bold hidden group-hover:inline transition-opacity duration-300">Gallery</span>
+      </div>
+
+    </div>
+  </div>
+
+  {% block content %}{% endblock %}
+
+
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+
+</html>
