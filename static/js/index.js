@@ -25,27 +25,25 @@ function captureImage() {
   // dot.classList.toggle('bg-white');
   // dot.classList.toggle('bg-gray-200');
 
-  // Tampilkan countdown selama 3 detik sebelum mengambil gambar
+
   let countdown = 3;
-  // const originalText = dot.innerHTML;
   dot.innerText = countdown;
   modalCountdown.classList.remove('hidden');
-  buttonCapture.disabled = true
+  buttonCapture.disabled = true;
 
   const countdownInterval = setInterval(() => {
     countdown--;
     if (countdown > 0) {
-      
       dot.innerText = countdown;
     } else {
       clearInterval(countdownInterval);
       modalCountdown.classList.add('hidden');
-      buttonCapture.disabled = false
-      dot.innerText = ''; // Bersihkan tampilan countdown
+      buttonCapture.disabled = false;
+      dot.innerText = '';
       dot.classList.toggle('bg-white');
       dot.classList.toggle('bg-gray-200');
 
-      // Ambil gambar setelah countdown selesai
+      // Ambil gambar dari canvas
       const context = canvas.getContext('2d');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
@@ -53,7 +51,7 @@ function captureImage() {
       const dataURL = canvas.toDataURL('image/png');
       loading.classList.remove('hidden')
 
-      // Kirim gambar ke server
+      // Kirim ke /analyze
       fetch('/analyze', {
         method: "POST",
         headers: {
@@ -65,14 +63,42 @@ function captureImage() {
       .then((data) => {
         loading.classList.add('hidden')
         console.log("Success", data);
+        console.log("Analyze Success", data);
+
         if (data.score !== undefined) {
           showScoreModal(data.smile, data.score); // Tampilkan modal hasil skor
+
+          // Konversi DataURL ke Blob
+          const byteString = atob(dataURL.split(',')[1]);
+          const ab = new ArrayBuffer(byteString.length);
+          const ia = new Uint8Array(ab);
+          for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+          }
+          const blob = new Blob([ab], { type: 'image/png' });
+
+          // Kirim ke /save-image
+          const formData = new FormData();
+          formData.append("image", blob, "captured-image " + Math.random() + ".jpg");
+
+          return fetch('/save-image', {
+            method: "POST",
+            body: formData
+          });
+        }
+      })
+      .then(res => res ? res.json() : null)
+      .then(saveResult => {
+        if (saveResult && saveResult.success) {
+          console.log("Gambar berhasil disimpan!");
         }
       })
       .catch((error) => console.error("Error", error));
     }
   }, 1000);
 }
+
+
 
 
 document.addEventListener("DOMContentLoaded", setupCamera);
