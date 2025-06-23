@@ -21,6 +21,10 @@ function captureImage() {
   const modalCountdown = document.getElementById('modalCountdown')
   const dot = document.getElementById('countdown');
   const buttonCapture = document.getElementById('buttonCapture')
+  const loading = document.getElementById('loading')
+  // dot.classList.toggle('bg-white');
+  // dot.classList.toggle('bg-gray-200');
+
 
   let countdown = 3;
   dot.innerText = countdown;
@@ -45,6 +49,7 @@ function captureImage() {
       canvas.height = video.videoHeight;
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const dataURL = canvas.toDataURL('image/png');
+      loading.classList.remove('hidden')
 
       // Kirim ke /analyze
       fetch('/analyze', {
@@ -56,7 +61,10 @@ function captureImage() {
       })
       .then((res) => res.json())
       .then((data) => {
+        loading.classList.add('hidden')
+        console.log("Success", data);
         console.log("Analyze Success", data);
+
         if (data.score !== undefined) {
           showScoreModal(data.smile, data.score); // Tampilkan modal hasil skor
 

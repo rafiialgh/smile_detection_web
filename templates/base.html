@@ -9,6 +9,8 @@
     href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bungee&family=Cabin&family=Permanent+Marker&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="{{url_for('static', filename='css/output.css')}}">
+
+  {% block head %}{% endblock %}
   <style>
     .font-blackhan {
       font-family: 'Black Han Sans', sans-serif;
