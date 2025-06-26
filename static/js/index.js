@@ -7,15 +7,15 @@ function toggleDot() {
 const video = document.getElementById("webcam");
 const canvas = document.getElementById("canvas")
 
-async function setupCamera() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    console.log(stream)
-    video.srcObject = stream;
-  } catch (err) {
-    console.error("Tidak dapat mengakses kamera:", err);
-  }
-}
+// async function setupCamera() {
+//   try {
+//     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//     console.log(stream)
+//     video.srcObject = stream;
+//   } catch (err) {
+//     console.error("Tidak dapat mengakses kamera:", err);
+//   }
+// }
 
 function captureImage() {
   const modalCountdown = document.getElementById('modalCountdown')

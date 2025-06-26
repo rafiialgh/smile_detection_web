@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, request
 import os
+import json
 from detect import analyze_image #, process_image
 from werkzeug.utils import secure_filename
 
@@ -7,6 +8,7 @@ app = Flask(__name__)
 
 UPLOAD_FOLDER = 'static/images/foto-foto'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+SCORE_FILE = 'scores.json'
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -32,7 +34,14 @@ def analyze():
 
 @app.route('/games')
 def games():
-  return render_template('game.html')
+    if os.path.exists(SCORE_FILE):
+        with open(SCORE_FILE, 'r') as f:
+            scores = json.load(f)
+    else:
+        scores = []
+
+    scores = sorted(scores, key=lambda x: x['score'], reverse=True)[:10]
+    return render_template('game.html', scores=scores)
 
 @app.route('/save-image', methods=['POST'])
 def save_image():
@@ -54,6 +63,46 @@ def save_image():
         return jsonify({'success': True, 'message': 'Gambar berhasil disimpan', 'file_path': filepath}), 200
     else:
         return jsonify({'success': False, 'message': 'File tidak valid'}), 400
+
+@app.route('/gallery')
+def gallery():
+    folder = os.path.join(app.static_folder, 'images', 'foto-foto')
+    image_files = [
+        f'images/foto-foto/{filename}'
+        for filename in os.listdir(folder)
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp'))
+    ]
+    return render_template('gallery.html', images=image_files)
+
+@app.route('/scoreboard')
+def scoreboard():
+    if os.path.exists(SCORE_FILE):
+        with open(SCORE_FILE, 'r') as f:
+            scores = json.load(f)
+    else:
+        scores = []
+
+    scores = sorted(scores, key=lambda x: x['score'], reverse=True)[:10]
+    return render_template('scoreboard.html', scores=scores)
+
+@app.route('/save-score', methods=['POST'])
+def save_score():
+    new_score = request.json
+    if not new_score:
+        return jsonify({'error': 'No data received'}), 400
+
+    # Baca file
+    if os.path.exists(SCORE_FILE):
+        with open(SCORE_FILE, 'r') as f:
+            scores = json.load(f)
+    else:
+        scores = []
+
+    scores.append(new_score)
+    with open(SCORE_FILE, 'w') as f:
+        json.dump(scores, f)
+
+    return jsonify({'status': 'success'})
 
 if __name__ == "__main__":
     app.run(debug=True)

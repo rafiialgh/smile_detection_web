@@ -321,7 +321,6 @@ function spawnKuman() {
   }, 4000);
 }
 
-
 function endGame() {
   clearInterval(gameInterval);
   clearInterval(spawnInterval);
@@ -354,26 +353,38 @@ function saveScore(name, score) {
   scores.push(newScore);
   scores.sort((a, b) => b.score - a.score); // Sort by score descending
   scores = scores.slice(0, 10); // Keep only top 10
+
+  fetch('/save-score', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newScore)
+  }).then(res => res.json()).then(data => {
+    console.log('Score saved:', data);
+  }).catch(err => {
+    console.error('Failed to save score:', err);
+  });
 }
 
 function showScoreboard() {
-  scoreboardList.innerHTML = '';
+  // scoreboardList.innerHTML = '';
 
-  if (scores.length === 0) {
-    scoreboardList.innerHTML =
-      '<li style="text-align: center; padding: 2rem; color: #666;">No scores yet!</li>';
-  } else {
-    scores.forEach((score, index) => {
-      const li = document.createElement('li');
-      li.className = 'scoreboard-item';
-      li.innerHTML = `
-        <span class="scoreboard-rank">#${index + 1}</span>
-        <span class="scoreboard-name">${score.name}</span>
-        <span class="scoreboard-score">${score.score}</span>
-      `;
-      scoreboardList.appendChild(li);
-    });
-  }
+  // if (scores.length === 0) {
+  //   scoreboardList.innerHTML =
+  //     '<li style="text-align: center; padding: 2rem; color: #666;">No scores yet!</li>';
+  // } else {
+  //   scores.forEach((score, index) => {
+  //     const li = document.createElement('li');
+  //     li.className = 'scoreboard-item';
+  //     li.innerHTML = `
+  //       <span class="scoreboard-rank">#${index + 1}</span>
+  //       <span class="scoreboard-name">${score.name}</span>
+  //       <span class="scoreboard-score">${score.score}</span>
+  //     `;
+  //     scoreboardList.appendChild(li);
+  //   });
+  // }
 
   scoreboardModal.classList.remove('hidden');
   scoreboardModal.style.display = 'flex';
@@ -404,3 +415,23 @@ function resetGame() {
 document.addEventListener('DOMContentLoaded', function () {
   initTouchEvents();
 });
+
+
+const touchBrush = document.getElementById("touch-toothbrush");
+
+  // Cek apakah perangkat touchscreen
+  const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+  if (isTouchDevice) {
+    document.addEventListener("touchmove", (e) => {
+      const touch = e.touches[0];
+      // Posisi mengikuti jari, sesuaikan offset agar lebih natural
+      touchBrush.style.left = touch.clientX - 190 + "px";
+      touchBrush.style.top = touch.clientY - 500 + "px";
+      touchBrush.classList.remove("hidden");
+    });
+
+    document.addEventListener("touchend", () => {
+      touchBrush.classList.add("hidden");
+    });
+  }

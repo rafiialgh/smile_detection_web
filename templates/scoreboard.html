@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex justify-center mt-10 mb-4 sm:mb-6 lg:mb-0">
+  <h1 class="font-bungee bg-[#FFE500] px-2 py-1 lg:px-5 lg:py-3 text-lg sm:text-xl md:text-4xl lg:text-5xl text-center">
+    SCOREBOARD 🏅
+  </h1>
+</div>
+
+<div class=" m-5 flex justify-center">
+  <div class="p-5 bg-white rounded-lg w-[70%] max-h-[80vh]">
+    {% if scores %}
+    <ul class="list-none p-0 my-4 space-y-2">
+      {% for score in scores %}
+      <li
+        class="text-center p-8 text-[#666] bg-[#ffd700] flex justify-between items-center px-2 py-4 mx-2 my-0 rounded-lg border-l-4 border-l-[#252B75] font-bold">
+        <span class="scoreboard-rank">#{{ loop.index }}</span>
+        <span class="scoreboard-name">{{ score.name }}</span>
+        <span class="scoreboard-score">{{ score.score }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-gray-500 mt-8 text-center">No scores yet!</p>
+    {% endif %}
+
+    <div class="flex gap-4 justify-center mt-6">
+      <button id="new-game-btn"
+        class="bg-[#252B75] text-white py-2 px-6 rounded-md font-semibold hover:bg-[#1a1f5a] transition">
+        <a href="/games">
+          New Game
+        </a>
+      </button>
+      
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/scoreboard.js') }}"></script>
+{% endblock %}

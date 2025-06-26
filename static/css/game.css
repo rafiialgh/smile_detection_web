@@ -663,3 +663,9 @@
     a {
       text-decoration: none !important;
     }
+
+    @media (hover: hover) {
+    #touch-toothbrush {
+      display: none !important;
+    }
+  }
